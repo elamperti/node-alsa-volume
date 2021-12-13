@@ -28,7 +28,9 @@ static void error_close_exit(char *errmsg, int err, snd_mixer_t *h_mixer)
 NAN_METHOD(getVolume)
 {
 	int err;
+	long min, max;
 	long vol;
+	long volInPercentage;
 	snd_mixer_t *h_mixer;
 	snd_mixer_selem_id_t *sid;
 	snd_mixer_elem_t *elem;
@@ -62,6 +64,9 @@ NAN_METHOD(getVolume)
 
 	snd_mixer_selem_get_playback_volume(elem, CHANNEL, &vol);
 
+	snd_mixer_selem_get_playback_volume_range(elem, &min, &max);
+	volInPercentage = (vol - min) * 100 / (max - min);
+
 	snd_mixer_close(h_mixer);
-	info.GetReturnValue().Set((double)vol);
+	info.GetReturnValue().Set((unsigned int)volInPercentage);
 }
